@@ -1,0 +1,16 @@
+{
+  "name": "koa-zone",
+  "version": "0.0.0-dev",
+  "description": "Request stack trace & execution context isolation",
+  "main": "dist/index.js",
+  "repository": "git@github.com:elierotenberg/koa-zone",
+  "author": "Elie Rotenberg <elie@rotenberg.io>",
+  "license": "MIT",
+  "devDependencies": {
+    "koa": "^2.2.0",
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "zone.js": "^0.8.5"
+  }
+}
