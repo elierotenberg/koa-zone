@@ -15,7 +15,7 @@ const sleep = duration => {
   }
 };
 
-describe('Integration with koa', () => {
+describe.skip('Integration with koa', () => {
   const app = new Koa()
     .use(bindToZone(recordSelfTime))
     .use(async (ctx, next) => {

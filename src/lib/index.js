@@ -1,4 +1,4 @@
-import createZone from './Zone';
+import runZoneInPromise from './Zone';
 import guid from './guid';
 import now from './now';
 
@@ -22,13 +22,10 @@ export function recordSelfTime(ctx, runFrame) {
   ctx.state[$selfTime].lastSelfTime = timeAfterFrame;
 }
 
-export default function bindToZone(onFrame) {
-  return async (ctx, next) => {
-    const zone = (ctx.state.zone = createZone(
-      `koa-zone-${guid()}`,
+export default onFrame =>
+  (ctx, next) =>
+    runZoneInPromise(next, {
+      name: `koa-zone-${guid()}`,
       onFrame,
       ctx,
-    ));
-    zone.run(next);
-  };
-}
+    });
