@@ -1,4 +1,5 @@
-const { describe, it, before, after } = global;
+const { describe, it } = global;
+import chai from 'chai';
 
 import runZoneInPromise from '../lib/Zone';
 
@@ -8,15 +9,20 @@ describe('runZoneInPromise', () => {
       name: 'no-op',
     }));
 
-  it('runs throwing function', done =>
-    runZoneInPromise(
-      () => {
-        throw new Error('test');
-      },
-      {
-        name: 'throwing',
-      },
-    )
-      .then(() => done(new Error('should have thrown')))
-      .catch(err => done()));
+  it('runs throwing function', async () => {
+    let err = null;
+    try {
+      await runZoneInPromise(
+        () => {
+          throw new Error('test');
+        },
+        {
+          name: 'throwing',
+        },
+      );
+    } catch (_err) {
+      err = _err;
+    }
+    chai.expect(err).to.be.an('error');
+  });
 });

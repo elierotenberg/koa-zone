@@ -1,18 +1,16 @@
 import 'zone.js';
 const { Zone } = global;
 
-import nextTick from './nextTick';
-
-const createPromiseZoneSpec = (
-  resolve,
-  reject,
-  {
-    name,
-    onFrame,
-    ctx,
-  },
-) => ({
-  name,
+class PromiseZoneSpec {
+  constructor({ name, onFrame, ctx }) {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+    this.name = name;
+    this.onFrame = onFrame;
+    this.ctx = ctx;
+  }
 
   onInvoke(
     parentZoneDelegate,
@@ -31,33 +29,29 @@ const createPromiseZoneSpec = (
         applysArgs,
         source,
       );
-    onFrame(ctx, runFrame);
-  },
+    this.onFrame(this.ctx, runFrame);
+  }
 
   onHandleError(parentZoneDelegate, currentZone, targetZone, err) {
-    reject(err);
-  },
+    this.reject(err);
+  }
 
   onHasTask(delegate, current, target, hasTaskState) {
     if (!hasTaskState.microTask && !hasTaskState.macroTask) {
-      resolve();
+      this.resolve();
     }
-  },
-});
+  }
+}
 
 export default function runZoneInPromise(
   start,
   { name, onFrame = (ctx, runFrame) => runFrame(), ctx = null },
 ) {
-  return new Promise((resolve, reject) =>
-    Zone.current
-      .fork(
-        createPromiseZoneSpec(resolve, reject, {
-          name,
-          onFrame,
-          ctx,
-        }),
-      )
-      // Run 'start' in next tick to avoid Zalgo
-      .run(() => nextTick().then(start)));
+  const promiseZoneSpec = new PromiseZoneSpec({
+    name,
+    onFrame,
+    ctx,
+  });
+  Zone.current.fork(promiseZoneSpec).run(() => process.nextTick(start));
+  return promiseZoneSpec.promise;
 }

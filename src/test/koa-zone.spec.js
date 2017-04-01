@@ -15,7 +15,7 @@ const sleep = duration => {
   }
 };
 
-describe.skip('Integration with koa', () => {
+describe('Integration with koa', () => {
   const app = new Koa()
     .use(bindToZone(recordSelfTime))
     .use(async (ctx, next) => {
@@ -30,9 +30,11 @@ describe.skip('Integration with koa', () => {
       next();
     });
   let server = null;
+
   before(done => {
     server = app.listen(5000, done);
   });
+
   it('Replies to ping and record self time', done => {
     request(server).get('/').end((err, res) => {
       if (err) {
@@ -46,5 +48,6 @@ describe.skip('Integration with koa', () => {
       done();
     });
   });
+
   after(() => server.close());
 });
